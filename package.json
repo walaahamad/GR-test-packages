@@ -1,0 +1,19 @@
+{
+  "name": "gr-test-packages",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/walaahamad/GR-test-packages.git"
+  },
+  "author": "wala' hamad",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/walaahamad/GR-test-packages/issues"
+  },
+  "homepage": "https://github.com/walaahamad/GR-test-packages#readme"
+}

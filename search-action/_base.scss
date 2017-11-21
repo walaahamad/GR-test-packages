@@ -1,0 +1,76 @@
+// SearchAction
+// ===
+//
+// Component description here
+// Variables
+// ---
+// SearchAction root
+// ---
+@mixin search_placehoder() {
+    color: $neutral-20;
+    font-weight: $bold-font-weight;    
+    font-size: $unit-lg;
+}
+
+.c-search-action {
+    // Root Class. Contains all core styles, typically for the component's
+    // wrapper element.
+    .pw-search__button-clear {
+        display: none !important;
+        order: 0;
+    }
+
+    .pw-search__bar {
+        padding-left: 0;
+
+        .pw-search__icon {
+            display: flex;
+        }
+    }
+
+    .pw-search {
+        &.pw--is-overlay {
+            .pw-search__button-submit {
+                position: relative !important;
+                clip: auto !important;
+                order: 2;
+                width: auto !important;
+                height: auto !important;
+                color: $neutral-70;
+            }
+        }
+
+        .pw-search__input {
+            &::-webkit-input-placeholder {
+                @include search_placehoder();
+            }
+
+            &::-moz-placeholder {
+                @include search_placehoder();
+            }
+
+            &:-ms-input-placeholder {
+                @include search_placehoder();
+            }
+
+            &:-moz-placeholder {
+                @include search_placehoder();
+            }
+            padding-left: 5*$unit+$sub-unit;
+        }
+    }
+
+    .pw-search__field {
+        order: 1;
+    }
+}
+
+.c-search-action__no-results {
+    position: absolute; 
+    top: 110px;  
+    left: 50%; 
+    display: block;    
+    width: 60%;
+    transform: translateX(-50%);    
+    -webkit-transform: translateX(-50%);
+}
