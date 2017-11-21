@@ -1,80 +1,94 @@
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.initHeader = exports.loadScript = exports.getParent = exports.goBack = exports.searchSubmit = exports.searchQueryChanged = exports.clearSuggestions = exports.closeSearch = exports.openSearch = exports.toggleHeader = exports.receiveHeaderData = exports.setIsHistoryPage = exports.popHistoryItem = exports.pushHistoryItem = undefined;
+
+var _actionCreation = require('progressive-web-sdk/dist/utils/action-creation');
+
+var _commands = require('progressive-web-sdk/dist/integration-manager/app/commands');
+
+var _dataObjects = require('progressive-web-sdk/dist/analytics/data-objects/');
+
+var _routing = require('progressive-web-sdk/dist/routing');
+
+var _parent = require('progressive-web-sdk/dist/iframe/parent');
+
+var _parent2 = _interopRequireDefault(_parent);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var pushHistoryItem = exports.pushHistoryItem = (0, _actionCreation.createAction)('Added item to history stack'); /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2017 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
+var popHistoryItem = exports.popHistoryItem = (0, _actionCreation.createAction)('Removed item from history stack');
 
-import {createAction, createActionWithAnalytics} from 'progressive-web-sdk/dist/utils/action-creation'
-import {getSearchSuggestions, searchProducts} from 'progressive-web-sdk/dist/integration-manager/app/commands'
-import {EVENT_ACTION} from 'progressive-web-sdk/dist/analytics/data-objects/'
-import {browserHistory} from 'progressive-web-sdk/dist/routing'
-import Parent from 'progressive-web-sdk/dist/iframe/parent'
+var setIsHistoryPage = exports.setIsHistoryPage = (0, _actionCreation.createAction)('Navigated to page from history', ['isHistoryPage']);
 
-export const pushHistoryItem = createAction('Added item to history stack')
+var searchAnalytics = (0, _actionCreation.createActionWithAnalytics)('Send search analytics', [], _dataObjects.EVENT_ACTION.search, function (query) {
+    return { query: query };
+});
 
-export const popHistoryItem = createAction('Removed item from history stack')
+var receiveHeaderData = exports.receiveHeaderData = (0, _actionCreation.createAction)('Receive header data');
+var toggleHeader = exports.toggleHeader = (0, _actionCreation.createAction)('Toggled the header', ['isCollapsed']);
 
-export const setIsHistoryPage = createAction('Navigated to page from history', ['isHistoryPage'])
+var openSearch = exports.openSearch = (0, _actionCreation.createAction)('Open header search');
+var closeSearch = exports.closeSearch = (0, _actionCreation.createAction)('Close header search');
+var clearSuggestions = exports.clearSuggestions = (0, _actionCreation.createAction)('Clear search suggestion');
 
-const searchAnalytics = createActionWithAnalytics(
-    'Send search analytics', [],
-    EVENT_ACTION.search,
-    (query) => ({query})
-)
+var searchQueryChanged = exports.searchQueryChanged = function searchQueryChanged(query) {
+    return function (dispatch) {
+        return dispatch((0, _commands.getSearchSuggestions)(query));
+    };
+};
 
-export const receiveHeaderData = createAction('Receive header data')
-export const toggleHeader = createAction('Toggled the header', ['isCollapsed'])
+var searchSubmit = exports.searchSubmit = function searchSubmit(query) {
+    return function (dispatch) {
+        dispatch(searchAnalytics(query));
+        dispatch((0, _commands.searchProducts)(query));
+    };
+};
 
-export const openSearch = createAction('Open header search')
-export const closeSearch = createAction('Close header search')
-export const clearSuggestions = createAction('Clear search suggestion')
+var goBack = exports.goBack = function goBack() {
+    return function (dispatch) {
+        dispatch(popHistoryItem());
+        dispatch(setIsHistoryPage(true));
+        return _routing.browserHistory.goBack();
+    };
+};
 
-export const searchQueryChanged = (query) => (dispatch) => (
-    dispatch(getSearchSuggestions(query))
-)
+var getParent = exports.getParent = function getParent() {
+    return new _parent2.default({
+        debug: true // eslint-disable-line no-undef
+    });
+};
 
-export const searchSubmit = (query) => (dispatch) => {
-    dispatch(searchAnalytics(query))
-    dispatch(searchProducts(query))
-}
+var loadScript = exports.loadScript = function loadScript(scritURL) {
+    var $ = window.jQuery;
+    return $.getScript(scritURL);
+};
 
-export const goBack = () => (dispatch) => {
-    dispatch(popHistoryItem())
-    dispatch(setIsHistoryPage(true))
-    return browserHistory.goBack()
-}
-
-export const getParent = () => new Parent({
-    debug: true // eslint-disable-line no-undef
-})
-
-export const loadScript = (scritURL) => {
-    const $ = window.jQuery
-    return $.getScript(scritURL)
-}
-
-
-export const initHeader = () => (
-    (dispatch) => {
-        return new Promise((resolve) => {
+var initHeader = exports.initHeader = function initHeader() {
+    return function (dispatch) {
+        return new Promise(function (resolve) {
 
             // Get the src of getSlicRacConfigScriptUrl script
-            getParent().callMethod('getSlicRacConfigScriptUrl')
-            .then(({data}) => {
-                loadScript(data)
-                .then(() => {
-                    dispatch(receiveHeaderData({sliConfigLoaded: true}))
-                })
-                .catch(() => {
+            getParent().callMethod('getSlicRacConfigScriptUrl').then(function (_ref) {
+                var data = _ref.data;
 
-                })
+                loadScript(data).then(function () {
+                    dispatch(receiveHeaderData({ sliConfigLoaded: true }));
+                }).catch(function () {});
+            });
 
-            })
+            getParent().callMethod('parseHeaderData').then(function (_ref2) {
+                var data = _ref2.data;
 
-            getParent().callMethod('parseHeaderData')
-            .then(({data}) => {
-                dispatch(receiveHeaderData(data))
-                return resolve()
-            })
-        })
-    }
-)
+                dispatch(receiveHeaderData(data));
+                return resolve();
+            });
+        });
+    };
+};

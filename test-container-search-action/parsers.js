@@ -1,37 +1,40 @@
-import {parseTextLink} from 'gr-test-utils/parser-utils'
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.getSlicRacConfigScriptUrl = undefined;
 
-export const getSlicRacConfigScriptUrl = () => {
-    const $ = window.jQuery
-    return $('body').find('script[src*="sli-rac.config"]')
-    .attr('src')
-}
+var _parserUtils = require('gr-test-utils/parser-utils');
 
-const parseSearch = ($response) => (
-    {
-        placeholderText: $response.find('#searchBox input')
-            .attr('placeholder') || ''
-    }
-)
+var getSlicRacConfigScriptUrl = exports.getSlicRacConfigScriptUrl = function getSlicRacConfigScriptUrl() {
+    var $ = window.jQuery;
+    return $('body').find('script[src*="sli-rac.config"]').attr('src');
+};
 
-const myAccountItemsIds = ['#login', '#myAccount', '#recommendations', '#giftregistry', '#wishlist', '#orderStatus']
+var parseSearch = function parseSearch($response) {
+    return {
+        placeholderText: $response.find('#searchBox input').attr('placeholder') || ''
+    };
+};
 
-const parseHeaderContent = () => {
-    const $ = window.jQuery
-    const $html = $('body')
+var myAccountItemsIds = ['#login', '#myAccount', '#recommendations', '#giftregistry', '#wishlist', '#orderStatus'];
+
+var parseHeaderContent = function parseHeaderContent() {
+    var $ = window.jQuery;
+    var $html = $('body');
 
     return {
-        logoLink: parseTextLink($html.find('#logo1 > a')),
+        logoLink: (0, _parserUtils.parseTextLink)($html.find('#logo1 > a')),
         search: parseSearch($html),
-        myAccountListData: myAccountItemsIds
-        .reduce((result, item) => {
-            const link = parseTextLink($html.find(item).find('a'))
+        myAccountListData: myAccountItemsIds.reduce(function (result, item) {
+            var link = (0, _parserUtils.parseTextLink)($html.find(item).find('a'));
             if (link.href) {
-                result.push(link)
+                result.push(link);
             }
-            return result
+            return result;
         }, [])
-    }
-}
+    };
+};
 
-export default parseHeaderContent
+exports.default = parseHeaderContent;
